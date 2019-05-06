@@ -39,7 +39,7 @@ class Places extends React.Component {
             return <Place info={item} key={item.id} />;
         });
         return (
-            <div id="places">
+            <div>
                 {items}
             </div>
         );

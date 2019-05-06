@@ -190,25 +190,10 @@ var MapBox =
 function (_React$Component) {
   _inherits(MapBox, _React$Component);
 
-  function MapBox(props) {
-    var _this;
-
+  function MapBox() {
     _classCallCheck(this, MapBox);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(MapBox).call(this, props));
-    _this.state = {
-      rect: new google.maps.Rectangle({
-        draggable: true,
-        editable: true,
-        bounds: {
-          north: 44.599,
-          south: 44.490,
-          east: -78.443,
-          west: -78.649
-        }
-      })
-    };
-    return _this;
+    return _possibleConstructorReturn(this, _getPrototypeOf(MapBox).apply(this, arguments));
   }
 
   _createClass(MapBox, [{
@@ -234,18 +219,167 @@ function (_React$Component) {
     key: "onCreate",
     value: function onCreate() {
       console.log('Creating box...');
-      this.state.rect.setMap(this.props.map);
-      this.state.rect.setBounds(this.props.map.getBounds());
+      this.props.rect.setBounds(this.props.map.getBounds());
+      this.props.rect.setVisible(true);
     }
   }, {
     key: "onRemove",
     value: function onRemove() {
       console.log('Removing box...');
-      this.state.rect.setMap(null);
+      this.props.rect.setVisible(false);
     }
   }]);
 
   return MapBox;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+/***/ }),
+
+/***/ "./src/components/maps.js":
+/*!********************************!*\
+  !*** ./src/components/maps.js ***!
+  \********************************/
+/*! exports provided: Maps */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Maps", function() { return Maps; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _places__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./places */ "./src/components/places.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+var Maps =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(Maps, _React$Component);
+
+  function Maps(props) {
+    var _this;
+
+    _classCallCheck(this, Maps);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Maps).call(this, props));
+    _this.geo = new google.maps.Geocoder();
+    _this.places = new google.maps.places.PlacesService(props.map);
+    return _this;
+  }
+
+  _createClass(Maps, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      console.log('Component mounted...');
+      var params = {
+        'address': 'Cebu City'
+      };
+      this.geo.geocode(params, function (results, status) {
+        switch (status) {
+          case 'OK':
+            _this2.onGeocodeDone(results[0].geometry.location);
+
+            break;
+
+          default:
+            console.log("Geocode was not successful: ".concat(status));
+            break;
+        }
+      });
+    }
+  }, {
+    key: "onGeocodeDone",
+    value: function onGeocodeDone(location) {
+      var _this3 = this;
+
+      console.log('Geocode done...'); // Center the map to this location.
+
+      this.props.map.setCenter(location); // Search for restaurants near the area.
+
+      var params = {
+        location: location,
+        radius: '500',
+        query: 'restaurant',
+        type: 'restaurant'
+      };
+      this.places.textSearch(params, function (results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          // Put markers on the map.
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = results[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var result = _step.value;
+
+              _this3.createPlaceMarker(result);
+            } // Display them in a list.
+
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_places__WEBPACK_IMPORTED_MODULE_2__["default"], {
+            items: results
+          }), document.getElementById('places'));
+        } else {
+          console.log("Places service was not successful: ".concat(status));
+        }
+      });
+    }
+  }, {
+    key: "createPlaceMarker",
+    value: function createPlaceMarker(place) {
+      var marker = new google.maps.Marker({
+        position: place.geometry.location,
+        map: this.props.map
+      });
+      google.maps.event.addListener(marker, 'click', function () {
+        console.log(place.name);
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null);
+    }
+  }]);
+
+  return Maps;
 }(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
 
 /***/ }),
@@ -351,9 +485,7 @@ function (_React$Component2) {
           key: item.id
         });
       });
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        id: "places"
-      }, items);
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, items);
     }
   }]);
 
@@ -377,7 +509,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _map__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./map */ "./src/map.js");
+/* harmony import */ var _components_maps__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/maps */ "./src/components/maps.js");
 /* harmony import */ var _components_buttons__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/buttons */ "./src/components/buttons.js");
 
 
@@ -386,140 +518,36 @@ __webpack_require__.r(__webpack_exports__);
 
 (function () {
   window.initMap = function () {
-    var map = new _map__WEBPACK_IMPORTED_MODULE_2__["Map"](document.getElementById('map')); // Display them buttons for creating/removing the map box.
-
-    react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_buttons__WEBPACK_IMPORTED_MODULE_3__["MapBox"], {
-      map: map.map
-    }), document.getElementById('mapbox'));
-  };
-})();
-
-/***/ }),
-
-/***/ "./src/map.js":
-/*!********************!*\
-  !*** ./src/map.js ***!
-  \********************/
-/*! exports provided: Map */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Map", function() { return Map; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _components_places__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/places */ "./src/components/places.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-
-var Map =
-/*#__PURE__*/
-function () {
-  function Map(elem) {
-    var _this = this;
-
-    _classCallCheck(this, Map);
-
-    this.map = new google.maps.Map(elem, {
+    var gmap = new google.maps.Map(document.getElementById('map'), {
       center: {
         lat: 0,
         lng: 0
       },
       zoom: 15
     });
-    this.geo = new google.maps.Geocoder();
-    this.geo.geocode({
-      'address': 'Cebu City'
-    }, function (results, status) {
-      switch (status) {
-        case 'OK':
-          _this.onGeocodeDone(results[0].geometry.location);
+    var rect = new google.maps.Rectangle({
+      draggable: true,
+      editable: true,
+      bounds: {
+        north: 44.599,
+        south: 44.490,
+        east: -78.443,
+        west: -78.649
+      },
+      map: gmap
+    }); // Mount the component that wraps Google Maps.
 
-          break;
+    react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_maps__WEBPACK_IMPORTED_MODULE_2__["Maps"], {
+      map: gmap,
+      rect: rect
+    }), document.getElementById('maps')); // Display the buttons for creating/removing the map box.
 
-        default:
-          console.log("Geocode was not successful: ".concat(status));
-          break;
-      }
-    });
-    this.info = new google.maps.InfoWindow();
-    this.places = new google.maps.places.PlacesService(this.map);
-  }
-
-  _createClass(Map, [{
-    key: "onGeocodeDone",
-    value: function onGeocodeDone(location) {
-      var _this2 = this;
-
-      // Center the map to this location.
-      this.map.setCenter(location); // Search for restaurants near the area.
-
-      var parameters = {
-        location: location,
-        radius: '500',
-        query: 'restaurant',
-        type: 'restaurant'
-      };
-      this.places.textSearch(parameters, function (results, status) {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          // Put markers on the map.
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
-
-          try {
-            for (var _iterator = results[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              var result = _step.value;
-
-              _this2.createPlaceMarker(result);
-            } // Display them in a list.
-
-          } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion && _iterator.return != null) {
-                _iterator.return();
-              }
-            } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
-              }
-            }
-          }
-
-          react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_places__WEBPACK_IMPORTED_MODULE_2__["default"], {
-            items: results
-          }), document.getElementById('places'));
-        } else {
-          console.log("Places service was not successful: ".concat(status));
-        }
-      });
-    }
-  }, {
-    key: "createPlaceMarker",
-    value: function createPlaceMarker(place) {
-      var marker = new google.maps.Marker({
-        position: place.geometry.location,
-        map: this.map
-      });
-      google.maps.event.addListener(marker, 'click', function () {
-        console.log(place.name);
-      });
-    }
-  }]);
-
-  return Map;
-}();
+    react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_buttons__WEBPACK_IMPORTED_MODULE_3__["MapBox"], {
+      map: gmap,
+      rect: rect
+    }), document.getElementById('mapbox'));
+  };
+})();
 
 /***/ })
 
